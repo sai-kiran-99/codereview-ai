@@ -73,7 +73,7 @@ export function HistoryPage() {
                     </span>
                   </div>
                   {r.summary && <p className="mt-1 line-clamp-2 text-sm text-slate-600">{r.summary}</p>}
-                  <div className="mt-2"><IssueCounts counts={r.issueCounts} /></div>
+                  {r.status === "done" && <div className="mt-2"><IssueCounts counts={r.issueCounts} /></div>}
                 </Link>
               </li>
             ))}

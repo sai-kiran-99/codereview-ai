@@ -17,6 +17,7 @@ export function CodeEditor({ value, onChange, disabled }: { value: string; onCha
         value={value}
         disabled={disabled}
         spellCheck={false}
+        wrap="off"
         placeholder="Paste your code here…"
         onChange={(e) => onChange(e.target.value)}
         onScroll={(e) => {
@@ -30,7 +31,7 @@ export function CodeEditor({ value, onChange, disabled }: { value: string; onCha
           onChange(value.slice(0, s) + "  " + value.slice(end));
           requestAnimationFrame(() => el.setSelectionRange(s + 2, s + 2));
         }}
-        className="flex-1 resize-none bg-transparent px-3 py-3 text-slate-100 outline-none placeholder:text-slate-600 disabled:opacity-60"
+        className="flex-1 resize-none overflow-auto whitespace-pre bg-transparent px-3 py-3 text-slate-100 outline-none placeholder:text-slate-600 disabled:opacity-60"
       />
     </div>
   );

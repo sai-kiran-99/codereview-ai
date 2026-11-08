@@ -89,7 +89,7 @@ export function ReviewDetailPage() {
         </div>
       )}
 
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
+      <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
         <CodeView ref={codeRef} code={review.code} issues={review.issues} activeLine={activeLine} />
         <div className="space-y-3">
           {review.issues.length === 0 && review.status === "done" ? (
