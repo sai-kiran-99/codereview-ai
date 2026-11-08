@@ -93,6 +93,7 @@ export async function createReview(req: Request, res: Response) {
       { _id: review._id },
       {
         status: "done",
+        model: stream.model,
         title: title || summary?.title || "Untitled review",
         summary: summary?.summary ?? "",
         issues: sorted,

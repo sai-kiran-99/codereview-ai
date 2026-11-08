@@ -11,6 +11,7 @@ const mockStream = vi.mocked(streamReview);
 
 function fakeModel(chunks: string[]) {
   mockStream.mockResolvedValue({
+    model: "test-model",
     chunks: (async function* () {
       for (const c of chunks) yield c;
     })(),
@@ -54,6 +55,7 @@ describe("POST /api/reviews (SSE)", () => {
     expect(saved?.title).toBe("Sum function");
     expect(saved?.issues).toHaveLength(2);
     expect(saved?.inputTokens).toBe(100);
+    expect(saved?.model).toBe("test-model");
     expect(saved?.latencyMs).toEqual(expect.any(Number));
   });
 
@@ -61,6 +63,7 @@ describe("POST /api/reviews (SSE)", () => {
     const { token } = await signupUser(app);
     // The stream starts, sends a summary, then the provider fails mid-way.
     mockStream.mockResolvedValue({
+      model: "test-model",
       chunks: (async function* () {
         yield '{"type":"summary","title":"t","summary":"partial"}\n';
         throw new Error("upstream 500 with secret details");
