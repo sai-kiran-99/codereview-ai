@@ -1,5 +1,7 @@
 # CodeReview AI
 
+**Live:** [codereview-ai-silk.vercel.app](https://codereview-ai-silk.vercel.app) · API: [codereview-ai-api.onrender.com/health](https://codereview-ai-api.onrender.com/health) (free tier: the first request after idle takes ~50 s)
+
 Paste code, get an AI code review streamed live: a summary first, then each issue with **severity**, **line number**, **category**, an explanation and a **suggested fix**.
 
 **Stack:** React + TypeScript + Vite + Tailwind · React Query + Zustand · Node + Express + TypeScript · MongoDB (Mongoose) · Gemini (`@google/genai`) · zod · SSE · JWT (access token in memory + httpOnly refresh cookie)
