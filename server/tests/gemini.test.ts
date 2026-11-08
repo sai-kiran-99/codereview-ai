@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 // Fake @google/genai: each model name maps to a behaviour.
 const behaviours: Record<string, "ok" | "silent" | "error"> = {};
 vi.mock("@google/genai", () => ({
+  ThinkingLevel: { LOW: "LOW" },
   GoogleGenAI: class {
     models = {
       generateContentStream: async ({ model, config }: { model: string; config: { abortSignal: AbortSignal } }) => {

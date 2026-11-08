@@ -1,4 +1,4 @@
-import { GoogleGenAI } from "@google/genai";
+import { GoogleGenAI, ThinkingLevel } from "@google/genai";
 import { env } from "../config.js";
 import { REVIEW_SYSTEM_PROMPT, buildReviewPrompt } from "../prompts/review.js";
 
@@ -6,10 +6,15 @@ export const MODEL = process.env.GEMINI_MODEL || "gemini-3.8-flash";
 /** Used when the main model fails or doesn't start answering in time. Set to "" to disable. */
 export const FALLBACK_MODEL = process.env.GEMINI_FALLBACK_MODEL ?? "gemini-3.6-flash";
 
-/** No first chunk within this time → give up on this model and try the fallback. */
-const FIRST_CHUNK_TIMEOUT_MS = Number(process.env.GEMINI_FIRST_CHUNK_TIMEOUT_MS) || 20_000;
-/** Hard limit for a whole review, so a request can never hang forever. */
-const TOTAL_TIMEOUT_MS = 120_000;
+/**
+ * These models "think" silently before writing, so the first text takes 10–20 s even for small code.
+ * No first chunk within this time → give up on this model and try the fallback.
+ */
+const FIRST_CHUNK_TIMEOUT_MS = Number(process.env.GEMINI_FIRST_CHUNK_TIMEOUT_MS) || 45_000;
+/** Hard limit for a whole review (both attempts), so a request can never hang forever. */
+const TOTAL_TIMEOUT_MS = 150_000;
+/** LOW thinking is faster and good enough for code review. Options: MINIMAL, LOW, MEDIUM, HIGH. */
+const THINKING_LEVEL = (process.env.GEMINI_THINKING_LEVEL || "LOW") as ThinkingLevel;
 
 let client: GoogleGenAI | undefined;
 function getClient(): GoogleGenAI {
@@ -45,6 +50,7 @@ async function startModel(model: string, prompt: string, outerSignal: AbortSigna
         systemInstruction: REVIEW_SYSTEM_PROMPT,
         temperature: 0.2, // low = more consistent, fewer made-up issues
         maxOutputTokens: 8192,
+        thinkingConfig: { thinkingLevel: THINKING_LEVEL },
         abortSignal: signal,
       },
     });
