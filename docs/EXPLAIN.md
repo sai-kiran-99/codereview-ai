@@ -240,3 +240,12 @@ Vite + React + TS + Tailwind. Pages: Login/Signup, New Review, History, Review d
 - **Cross-site cookie:** Vercel and Render are different sites, so the refresh cookie is `SameSite=None; Secure` in production, and CORS allows only `CLIENT_URL` with `credentials: true`. `trust proxy` is on because Render terminates HTTPS in front of us.
 - **Atlas:** Render free has no fixed IP → allow `0.0.0.0/0` in Network Access (protected by the DB password).
 - **Cold starts:** Render free sleeps after 15 min idle; the first request takes ~30–50 s.
+
+### What went wrong on launch day (good interview stories)
+1. **Render build failed with `TS7016: Could not find a declaration file for module 'express'`.** Render sets `NODE_ENV=production`, so `npm ci` skipped devDependencies (`typescript`, `@types/*`). Fix: `npm ci --include=dev && npm run build`. The running server still only needs the compiled `dist/`.
+2. **Server stopped right after a successful build: "Could not connect to any servers in your MongoDB Atlas cluster".** Atlas only allowed my laptop's IP; Render's free tier has no fixed IP. Fix: allow `0.0.0.0/0` (the DB password still protects it). The fail-fast startup (Step 3) made this obvious in the logs instead of failing on the first user request.
+3. **Gemini model overloaded.** `gemini-3.8-flash` returned `503 high demand` or sent nothing for 45+ s. Because the service has a first-chunk timeout + fallback model, users still got a review (46.6 s instead of failing). Then production switched to `gemini-3.6-flash` (~2 s to first text) via an env var — no code change.
+4. **Thinking models are silent at first.** Even for 7 lines, the first text arrives after 10–18 s while the model "thinks". A 20 s first-chunk timeout was too strict → 45 s, plus `thinkingLevel: LOW`.
+5. **`codereview-ai.vercel.app` was taken** by another account, so Vercel assigned `codereview-ai-silk.vercel.app`, and the API's `CLIENT_URL` (CORS allow-list) had to be updated to match.
+
+**Verified live:** signup → streamed review (EventStream shows `review` → `summary` → `done`) → page refresh keeps the session (cross-site httpOnly cookie works in Chrome; Safari may block it — fix later by proxying `/api` through Vercel so the cookie is same-site).
